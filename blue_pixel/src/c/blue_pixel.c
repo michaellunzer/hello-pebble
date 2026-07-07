@@ -1,4 +1,5 @@
 #include <pebble.h>
+#include <stdlib.h>
 
 static Window *s_window;
 static TextLayer *s_time_layer;
@@ -9,8 +10,25 @@ static GBitmap *s_night_bitmap;
 static BitmapLayer *s_bitmap_layer;
 static bool s_palettes_combined = false;
 static bool s_show_date = true;
+static int s_globe_view = 0;
 
 #define PERSIST_KEY_SHOW_DATE 0
+#define PERSIST_KEY_GLOBE_VIEW 1
+
+#define GLOBE_VIEW_OCEANIA 0
+#define GLOBE_VIEW_AMERICAS 1
+
+static uint32_t day_resource_id(void) {
+    return s_globe_view == GLOBE_VIEW_AMERICAS ? RESOURCE_ID_BLUE_MARBLE_AMERICAS : RESOURCE_ID_BLUE_MARBLE;
+}
+
+static uint32_t night_resource_id(void) {
+    return s_globe_view == GLOBE_VIEW_AMERICAS ? RESOURCE_ID_BLACK_MARBLE_AMERICAS : RESOURCE_ID_BLACK_MARBLE;
+}
+
+static uint32_t limits_resource_id(void) {
+    return s_globe_view == GLOBE_VIEW_AMERICAS ? RESOURCE_ID_LIMITS_AMERICAS : RESOURCE_ID_LIMITS;
+}
 
 static void update_background_image(struct tm *utc_time) {
     // It is my understanding that the palette bitmap types allow you to have x many colours from the palette. So 2BitPalette allows for 4 colours.
@@ -20,13 +38,14 @@ static void update_background_image(struct tm *utc_time) {
     //         (unsigned long)heap_bytes_free(), (unsigned long)heap_bytes_used());
     
     if (s_day_bitmap == NULL) {
-        s_day_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BLUE_MARBLE);
+        s_day_bitmap = gbitmap_create_with_resource(day_resource_id());
         s_palettes_combined = false; // reset this flag whenever we load new bitmaps to ensure palettes are combined correctly
     }
     if (s_night_bitmap == NULL) {
-        s_night_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BLACK_MARBLE);
+        s_night_bitmap = gbitmap_create_with_resource(night_resource_id());
         s_palettes_combined = false;
     }
+    if (!s_day_bitmap || !s_night_bitmap) { return; }
 
     // Print the palette colours
     int n_colours_per_palette = 8;
@@ -84,15 +103,15 @@ static void update_background_image(struct tm *utc_time) {
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "Bitmap dimensions: %d cols x %d rows, bytes per row: %d", cols, rows, bytes_per_row);
 
     // Get pregenerated limits array
-    ResHandle handle = resource_get_handle(RESOURCE_ID_LIMITS);
+    ResHandle handle = resource_get_handle(limits_resource_id());
     // Limits binary stores every other row (half the display rows) with 3 limit columns
     unsigned int stored_rows = (rows + 1) / 2;  // ceil(rows/2) = 84 for 168
     size_t block_size_bytes = stored_rows * 3 * sizeof(uint8_t);
     uint8_t *s_buffer = (uint8_t*)malloc(block_size_bytes);
     if (!s_buffer) { return; }
 
-    // time_idx: 0-based half-hour index (0..47)
-    int time_idx = utc_time->tm_hour * 2 + (utc_time->tm_min >= 30 ? 1 : 0);
+    // time_idx: 0-based hour index (0..23)
+    int time_idx = utc_time->tm_hour;
     // month: 0-based (tm_mon is already 0-based in C)
     int month = utc_time->tm_mon;
     int block_index = time_idx * 12 + month;
@@ -235,6 +254,29 @@ static void inbox_received_handler(DictionaryIterator *iterator, void *context) 
         persist_write_bool(PERSIST_KEY_SHOW_DATE, s_show_date);
         update_layout();
     }
+
+    Tuple *globe_view_t = dict_find(iterator, MESSAGE_KEY_GLOBE_VIEW);
+    if (globe_view_t) {
+        // Clay sends select values as strings
+        int view = globe_view_t->type == TUPLE_CSTRING
+            ? atoi(globe_view_t->value->cstring)
+            : (int)globe_view_t->value->int32;
+        if (view != s_globe_view) {
+            s_globe_view = view;
+            persist_write_int(PERSIST_KEY_GLOBE_VIEW, s_globe_view);
+            // Drop the loaded bitmaps so the new view's resources get loaded
+            if (s_day_bitmap) {
+                gbitmap_destroy(s_day_bitmap);
+                s_day_bitmap = NULL;
+            }
+            if (s_night_bitmap) {
+                gbitmap_destroy(s_night_bitmap);
+                s_night_bitmap = NULL;
+            }
+            s_palettes_combined = false;
+            update_time(true);
+        }
+    }
 }
 
 static void prv_window_load(Window *window) {
@@ -274,8 +316,9 @@ static void prv_window_unload(Window *window) {
 }
 
 static void prv_init(void) {
-    // Load persisted setting; default to showing the date
+    // Load persisted settings; default to showing the date over the Americas
     s_show_date = persist_exists(PERSIST_KEY_SHOW_DATE) ? persist_read_bool(PERSIST_KEY_SHOW_DATE) : true;
+    s_globe_view = persist_exists(PERSIST_KEY_GLOBE_VIEW) ? persist_read_int(PERSIST_KEY_GLOBE_VIEW) : GLOBE_VIEW_AMERICAS;
 
     // Entry point: create the main window and set up handlers
     s_window = window_create();

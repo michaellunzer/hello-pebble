@@ -30,9 +30,27 @@ This project aims to create a pebble watch face from a pixel art earth (inspired
 - `resize_images.py` — Resize source images for each platform
 
 
-A view of earth from space inspired by the blue marble and hello world images from Artemis and Apollo missions. Presents a fixed view of earth with a transition from day to night (approximate in half hour increments), focussed over Oceania and Southeast Asia - so great if you live in Australia, at a similar longitude, or you just want to experience the vibe of living that part of the world through your Pebble. 
+A view of earth from space inspired by the blue marble and hello world images from Artemis and Apollo missions. Presents a fixed view of earth with a transition from day to night (approximated in hourly increments).
 
-I'll will endeavour to draw up more parts of the world in time...
+## Globe views
+
+Two views are selectable from the watchface settings (Clay config page):
+
+- **Americas (California)** — centred at 23°N 108°W, default in this fork
+- **Oceania & SE Asia** — the original hand-drawn view centred at 3.8°S 134°E
+
+### Generating additional views
+
+This fork adds `generate_view.py`, a Python port of the R pipeline that produces the day/night PNGs and the limits binary for any projection centre. It classifies land/ocean/ice from NASA's [land_shallow_topo](https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57752/land_shallow_topo_2048.jpg) equirectangular map and samples city lights from the [2012 night lights composite](https://eoimages.gsfc.nasa.gov/images/imagerecords/79000/79765/dnb_land_ocean_ice.2012.3600x1800.jpg), quantised to the same 8-colour palette as the hand-drawn art:
+
+```
+uv run python generate_view.py --view americas --lat 23 --lon -108 \
+    --land land_shallow_topo_2048.jpg --night night_lights.jpg
+```
+
+To wire a new view in, add its bitmaps/limits to `blue_pixel/package.json`, a select option in `src/pkjs/config.js`, and a case in the resource pickers in `src/c/blue_pixel.c`.
+
+Note: the limits binaries store hourly (not half-hour) UTC slots, and bitmaps use `"spaceOptimization": "storage"`, so that two full views fit within the 256KB resource limit per platform.
 
 # Troubleshooting
 I was running into issues with qemu getting stuck booting and complete reinstall involves.

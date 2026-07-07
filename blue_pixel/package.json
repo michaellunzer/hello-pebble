@@ -23,7 +23,8 @@
       "watchface": true
     },
     "messageKeys": [
-      "SHOW_DATE"
+      "SHOW_DATE",
+      "GLOBE_VIEW"
     ],
     "resources": {
       "media": [
@@ -32,7 +33,7 @@
           "name": "BLUE_MARBLE",
           "file": "blue_marble_gabbro.png",
           "memoryFormat": "4BitPalette",
-          "spaceOptimization": "memory",
+          "spaceOptimization": "storage",
           "targetPlatforms": [
             "gabbro"
           ]
@@ -42,7 +43,7 @@
           "name": "BLACK_MARBLE",
           "file": "black_marble_gabbro.png",
           "memoryFormat": "4BitPalette",
-          "spaceOptimization": "memory",
+          "spaceOptimization": "storage",
           "targetPlatforms": [
             "gabbro"
           ]
@@ -52,7 +53,7 @@
           "name": "BLUE_MARBLE",
           "file": "blue_marble_emery.png",
           "memoryFormat": "4BitPalette",
-          "spaceOptimization": "memory",
+          "spaceOptimization": "storage",
           "targetPlatforms": [
             "emery"
           ]
@@ -62,7 +63,7 @@
           "name": "BLACK_MARBLE",
           "file": "black_marble_emery.png",
           "memoryFormat": "4BitPalette",
-          "spaceOptimization": "memory",
+          "spaceOptimization": "storage",
           "targetPlatforms": [
             "emery"
           ]
@@ -72,7 +73,7 @@
           "name": "BLUE_MARBLE",
           "file": "blue_marble_basalt.png",
           "memoryFormat": "4BitPalette",
-          "spaceOptimization": "memory",
+          "spaceOptimization": "storage",
           "targetPlatforms": [
             "basalt"
           ]
@@ -82,7 +83,7 @@
           "name": "BLACK_MARBLE",
           "file": "black_marble_basalt.png",
           "memoryFormat": "4BitPalette",
-          "spaceOptimization": "memory",
+          "spaceOptimization": "storage",
           "targetPlatforms": [
             "basalt"
           ]
@@ -107,6 +108,90 @@
           "type": "raw",
           "name": "LIMITS",
           "file": "limits_emery.bin",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "bitmap",
+          "name": "BLUE_MARBLE_AMERICAS",
+          "file": "blue_marble_americas_gabbro.png",
+          "memoryFormat": "4BitPalette",
+          "spaceOptimization": "storage",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "bitmap",
+          "name": "BLACK_MARBLE_AMERICAS",
+          "file": "black_marble_americas_gabbro.png",
+          "memoryFormat": "4BitPalette",
+          "spaceOptimization": "storage",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "bitmap",
+          "name": "BLUE_MARBLE_AMERICAS",
+          "file": "blue_marble_americas_emery.png",
+          "memoryFormat": "4BitPalette",
+          "spaceOptimization": "storage",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "bitmap",
+          "name": "BLACK_MARBLE_AMERICAS",
+          "file": "black_marble_americas_emery.png",
+          "memoryFormat": "4BitPalette",
+          "spaceOptimization": "storage",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "bitmap",
+          "name": "BLUE_MARBLE_AMERICAS",
+          "file": "blue_marble_americas_basalt.png",
+          "memoryFormat": "4BitPalette",
+          "spaceOptimization": "storage",
+          "targetPlatforms": [
+            "basalt"
+          ]
+        },
+        {
+          "type": "bitmap",
+          "name": "BLACK_MARBLE_AMERICAS",
+          "file": "black_marble_americas_basalt.png",
+          "memoryFormat": "4BitPalette",
+          "spaceOptimization": "storage",
+          "targetPlatforms": [
+            "basalt"
+          ]
+        },
+        {
+          "type": "raw",
+          "name": "LIMITS_AMERICAS",
+          "file": "limits_americas_basalt.bin",
+          "targetPlatforms": [
+            "basalt"
+          ]
+        },
+        {
+          "type": "raw",
+          "name": "LIMITS_AMERICAS",
+          "file": "limits_americas_gabbro.bin",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "raw",
+          "name": "LIMITS_AMERICAS",
+          "file": "limits_americas_emery.bin",
           "targetPlatforms": [
             "emery"
           ]
