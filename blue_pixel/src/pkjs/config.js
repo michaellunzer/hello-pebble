@@ -16,14 +16,14 @@ module.exports = [
         "type": "select",
         "messageKey": "GLOBE_VIEW",
         "label": "Globe View",
-        "defaultValue": "1",
+        "defaultValue": "0",
         "options": [
           {
-            "label": "Oceania & SE Asia",
+            "label": "Australia",
             "value": "0"
           },
           {
-            "label": "Americas (California)",
+            "label": "North America",
             "value": "1"
           }
         ]

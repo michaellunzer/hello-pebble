@@ -36,8 +36,8 @@ A view of earth from space inspired by the blue marble and hello world images fr
 
 Two views are selectable from the watchface settings (Clay config page):
 
-- **Americas (California)** — centred at 23°N 108°W, default in this fork
-- **Oceania & SE Asia** — the original hand-drawn view centred at 3.8°S 134°E
+- **Australia** — the original hand-drawn Oceania/SE Asia view centred at 3.8°S 134°E (default)
+- **North America** — centred at 23°N 108°W, great for the California coast
 
 ### Generating additional views
 

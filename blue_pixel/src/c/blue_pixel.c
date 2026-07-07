@@ -316,9 +316,9 @@ static void prv_window_unload(Window *window) {
 }
 
 static void prv_init(void) {
-    // Load persisted settings; default to showing the date over the Americas
+    // Load persisted settings; default to showing the date over Australia
     s_show_date = persist_exists(PERSIST_KEY_SHOW_DATE) ? persist_read_bool(PERSIST_KEY_SHOW_DATE) : true;
-    s_globe_view = persist_exists(PERSIST_KEY_GLOBE_VIEW) ? persist_read_int(PERSIST_KEY_GLOBE_VIEW) : GLOBE_VIEW_AMERICAS;
+    s_globe_view = persist_exists(PERSIST_KEY_GLOBE_VIEW) ? persist_read_int(PERSIST_KEY_GLOBE_VIEW) : GLOBE_VIEW_OCEANIA;
 
     // Entry point: create the main window and set up handlers
     s_window = window_create();
