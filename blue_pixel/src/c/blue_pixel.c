@@ -11,6 +11,12 @@ static BitmapLayer *s_bitmap_layer;
 static bool s_palettes_combined = false;
 static bool s_show_date = true;
 static int s_globe_view = 0;
+// Combined palette lives here, NOT in a bitmap-owned heap buffer:
+// gbitmap_set_palette() frees a bitmap's existing heap-owned palette, so
+// passing a bitmap's own palette back into it leaves every bitmap pointing
+// at freed memory (renders garbage once the block is reused, e.g. after a
+// view switch reloads the bitmaps).
+static GColor s_combined_palette[16];
 
 #define PERSIST_KEY_SHOW_DATE 0
 #define PERSIST_KEY_GLOBE_VIEW 1
@@ -49,14 +55,15 @@ static void update_background_image(struct tm *utc_time) {
 
     // Print the palette colours
     int n_colours_per_palette = 8;
-    GColor *day_palette = gbitmap_get_palette(s_day_bitmap);
 
     if (!s_palettes_combined) {
         // Only combine if we are reloading the bitmaps otherwise we garble the palette
+        GColor *day_palette = gbitmap_get_palette(s_day_bitmap);
         GColor *night_palette = gbitmap_get_palette(s_night_bitmap);
-        // combine the two palettes
+        // combine the two palettes into our own buffer (day 0-7, night 8-15)
         for (int i = 0; i < n_colours_per_palette; i++) {
-            day_palette[i+n_colours_per_palette] = night_palette[i];
+            s_combined_palette[i] = day_palette[i];
+            s_combined_palette[i+n_colours_per_palette] = night_palette[i];
         }
 
         // logging
@@ -76,8 +83,6 @@ static void update_background_image(struct tm *utc_time) {
         //     APP_LOG(APP_LOG_LEVEL_DEBUG, "Color %d: R=%d G=%d B=%d A=%d", i, color.r, color.g, color.b, color.a);
         // }
 
-        gbitmap_set_palette(s_day_bitmap, day_palette, false);
-        gbitmap_set_palette(s_night_bitmap, day_palette, false);
         s_palettes_combined = true;
     }
 
@@ -178,8 +183,9 @@ static void update_background_image(struct tm *utc_time) {
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "Memory merged: Free=%lu Used=%lu", 
     //         (unsigned long)heap_bytes_free(), (unsigned long)heap_bytes_used());
 
-    // set the palette on the already-created bitmap
-    gbitmap_set_palette(s_bitmap, day_palette, false);
+    // set the palette on the already-created bitmap (frees the blank
+    // bitmap's own palette; ours is static so it can never dangle)
+    gbitmap_set_palette(s_bitmap, s_combined_palette, false);
         
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "Memory assigned: Free=%lu Used=%lu", 
     //         (unsigned long)heap_bytes_free(), (unsigned long)heap_bytes_used());
